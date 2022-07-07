@@ -1,0 +1,32 @@
+version: '3.5'
+networks:
+  backend:
+services:
+  tanuki-nginx:
+    image: nginx:alpine
+    container_name: tanuki-nginx
+    restart: unless-stopped
+    ports:
+      - 80:80
+    volumes:
+      - ../project:/var/www/project
+      - ./nginx/conf.d/tanuki.conf:/etc/nginx/conf.d/tanuki.conf
+      - ./nginx/logs:/var/log/nginx/
+    depends_on:
+      - tanuki-php74
+    links:
+      - tanuki-php74
+    networks:
+      - backend
+  tanuki-php74:
+    build: ./php
+    container_name: tanuki-php74
+    restart: unless-stopped
+    volumes:
+      - ../project:/var/www/project
+      - ./php/ini/dev/php.ini:/usr/local/etc/php/php.ini
+    working_dir: /var/www
+    ports:
+      - 9000:9000
+    networks:
+      - backend
